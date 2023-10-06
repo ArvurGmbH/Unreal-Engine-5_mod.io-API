@@ -8,14 +8,13 @@ Anywhere in your Unreal Engine project you can access the mod.io API Subsystem:
 On that you can create mod.io API Connections:
 ![Screenshot 2023-10-06 165321](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/aa1d5aa5-44de-41fd-aad8-5bc1c6282bee)
 
-
-Now you can get that newly created Connection, again anywhere in your project:
-![Screenshot 2023-10-06 165455](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/bd770fed-0504-4bd4-9dbd-e5966ae81a16)
-
 You need to input the mod.io Game ID and the API-Key for your Game on mod.io.
 Also you can enable automated Access Token caching, making it even more comfortable to use the API.
 Also you can enable the automated storing of the Access Token persistingly on the disk of the User.
 
+
+Now you can get that newly created Connection, again anywhere in your project:
+![Screenshot 2023-10-06 165455](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/bd770fed-0504-4bd4-9dbd-e5966ae81a16)
 
 
 And from that Object you can call all the functionality for the API:
