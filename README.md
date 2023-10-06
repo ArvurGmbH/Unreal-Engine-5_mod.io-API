@@ -5,6 +5,7 @@ See https://mod.io/ for more general info on mod.io.
 This Plugin allows you to directly interact with the mod.io API through Unreal Engine Blueprints or C++ Code.
 It is designed strictly according to information published on the mod.io API Documention:
 https://docs.mod.io
+
 All the listed API Requests can be made through the Plugin.
 
 However this is **not an official** Plugin!
