@@ -26,7 +26,7 @@ Also you can enable the automated storing of the Access Token persistingly on th
 Now you can get that newly created Connection, again anywhere in your project:
 ![Screenshot 2023-10-06 165455](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/bd770fed-0504-4bd4-9dbd-e5966ae81a16)
 
-You can also create multiple API connections simulationiously. To get a specific Connection you can get it via the Game ID:
+You can also create multiple API connections simultioniously. To get a specific Connection you can get it via the Game ID:
 ![Screenshot 2023-10-06 172519](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/1b2536c8-a704-4cd4-87f4-871239ed689a)
 
 
