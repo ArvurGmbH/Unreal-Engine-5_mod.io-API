@@ -28,6 +28,7 @@ Now you can get that newly created Connection, again anywhere in your project:
 
 And from that Object you can call all the functionality for the API:
 ![Screenshot 2023-10-06 165706](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/30d78700-7ad5-4766-9fb6-f2c698352220)
+![Screenshot 2023-10-06 172111](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/85ee80e7-83fa-4656-aad3-004dcf5e8d02)
 
 
 To react to receiving a response for a request you can bind events to the Event Dispatchers prepared for each request:
