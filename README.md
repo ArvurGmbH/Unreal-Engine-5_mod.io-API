@@ -9,9 +9,12 @@ https://docs.mod.io
 All the listed API Requests can be made through the Plugin.
 
 However this is **not an official** Plugin!
+
 This Plugin makes use of two free & open source Unreal Engine Plugins created by Georgy Treshchev.
 The Plugins are called "Runtime Files Downloader" & "Runtime Archiver".
-You can find the Plugins on the Github Page of the Creator: https://github.com/gtreshchev
+You can find the Plugins on the Github Page of the Creator:
+https://github.com/gtreshchev
+
 Georgy Treshchev is working for mod.io, so I hope there's no issue with using these Plugins for this Project as well.
 
 # How to use it in Blueprints
