@@ -1,0 +1,25 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "RuntimeFilesDownloader",
+  "Description": "Runtime Files Downloader is an open-source plugin for downloading files over HTTP / HTTPS at runtime.",
+  "Category": "Code Plugins",
+  "CreatedBy": "Georgy Treshchev",
+  "CreatedByURL": "https://github.com/gtreshchev",
+  "DocsURL": "https://github.com/gtreshchev/RuntimeFilesDownloader/wiki/",
+  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/e7e6df6d6e9c46f0ae35163eab67ff9a",
+  "SupportURL": "https://georgy.dev/",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": true,
+  "EngineVersion": "5.3.0",
+  "Modules": [
+    {
+      "Name": "RuntimeFilesDownloader",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
