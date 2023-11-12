@@ -9,6 +9,17 @@ https://docs.mod.io
 All the listed API Requests can be made through the Plugin.
 
 # However this is **not an official** Plugin!
+You can find the official Unreal Engine SDK Plugin provided by mod.io over here:
+https://github.com/modio/modio-ue
+
+While it's wonderful to have that officially supported and developed SDK coming a lot of features it's often versions behind the latest stable Unreal Engine Version, missing a few API Requests that can be helpful, doesn't give developers total control over how they want to interact with mod.io as well as no official Android Platform support.
+That's why I decided to create an Open Source Community Plugin as an unsupported alternative.
+
+# Dependencies / Requirements
+This Plugin is coded for Unreal Engine 5.3, but I don't see why the code wouldn't compile for any other Unreal Engine 5 Version or custom Engine release.
+The code is very lightweight and there aren't a lot of external dependencies.
+
+**HOWEVER:**
 
 This Plugin makes use of two free & open source Unreal Engine Plugins created by Georgy Treshchev.
 The Plugins are called "Runtime Files Downloader" & "Runtime Archiver".
@@ -16,6 +27,7 @@ You can find the Plugins on the Github Page of the Creator:
 https://github.com/gtreshchev
 
 Georgy Treshchev is working for mod.io, so I hope there's no issue with using these Plugins for this Project as well.
+I simply included them along in this repository.
 
 # This is Work-in-Progress
 I'm planning to have a Version 1.0 ready by the end of 2023.
