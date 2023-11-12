@@ -17,6 +17,20 @@ https://github.com/gtreshchev
 
 Georgy Treshchev is working for mod.io, so I hope there's no issue with using these Plugins for this Project as well.
 
+# This is heavily Work-in-Progress!!!
+I'm planning to have a Version 1.0 ready by the end of 2023.
+Every API Call implemented yet is tested while being implemented. Yet no additional testing has been done, so expect challenges, problems, holdups or errors!
+Also so far only about 50% of the API Requests are fully implemented!
+
+What can you expect from Version 1.0?
+- Unreal Engine 5.2 / 5.3 / Later support
+- Windows and Android support
+- All the API Requests are fully implemented
+- Working with the local Cache
+- Downloading / Uploading of Modfiles & Media
+
+Some of these are already done, but others are WiP.
+
 # How to use it in Blueprints
 Anywhere in your Unreal Engine project you can access the mod.io API Subsystem:
 ![Screenshot 2023-10-06 165855](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/29de911c-7edd-4b21-bcf0-2242c07d971a)
