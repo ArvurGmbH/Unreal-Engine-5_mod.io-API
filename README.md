@@ -8,7 +8,7 @@ https://docs.mod.io
 
 All the listed API Requests can be made through the Plugin.
 
-However this is **not an official** Plugin!
+# However this is **not an official** Plugin!
 
 This Plugin makes use of two free & open source Unreal Engine Plugins created by Georgy Treshchev.
 The Plugins are called "Runtime Files Downloader" & "Runtime Archiver".
@@ -17,7 +17,7 @@ https://github.com/gtreshchev
 
 Georgy Treshchev is working for mod.io, so I hope there's no issue with using these Plugins for this Project as well.
 
-# This is heavily Work-in-Progress!!!
+# This is Work-in-Progress
 I'm planning to have a Version 1.0 ready by the end of 2023.
 Every API Call implemented yet is tested while being implemented. Yet no additional testing has been done, so expect challenges, problems, holdups or errors!
 Also so far only about 50% of the API Requests are fully implemented!
@@ -29,7 +29,7 @@ What can you expect from Version 1.0?
 - Working with the local Cache
 - Downloading / Uploading of Modfiles & Media
 
-Some of these are already done, but others are WiP.
+Some of these are already done (Version 0.7), but others are WiP.
 
 # How to use it in Blueprints
 Anywhere in your Unreal Engine project you can access the mod.io API Subsystem:
