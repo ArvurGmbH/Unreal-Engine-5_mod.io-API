@@ -7,6 +7,7 @@ It is designed strictly according to information published on the mod.io API Doc
 https://docs.mod.io
 
 All the listed API Requests can be made through the Plugin.
+It's programmed in C++ but meant to be used via Blueprint Visual Scripts.
 
 # This is **not an official** Plugin!
 You can find the official Unreal Engine SDK Plugin provided by mod.io over here:
