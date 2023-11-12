@@ -62,3 +62,10 @@ To react to receiving a response for a request you can bind events to the Event 
 
 Also the Plugin features caching the data you received for previous requests and you can easily get the cached data:
 ![Screenshot 2023-10-06 170315](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/b0479ccf-d921-4bc0-8530-1f420ab6e421)
+![Cached](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/0a9448ab-48ab-4158-b4cc-12d15adcef24)
+
+
+For some of the Requests as well as some utility Functions like Uploading / Downloading there are Async Actions available:
+![UploadZip](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/feec57fa-5639-4b8d-a907-710a71d070bf)
+![AsyncActions](https://github.com/ArvurGmbH/Unreal_Engine-Mod.io_API/assets/147174198/1fe8e686-7770-4edf-ba99-2d1ca2c1b972)
+
