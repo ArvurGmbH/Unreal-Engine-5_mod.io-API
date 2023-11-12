@@ -38,8 +38,8 @@ Also so far only about 50% of the API Requests are fully implemented!
 What can you expect from Version 1.0?
 - Unreal Engine 5.2 / 5.3 / Later support
 - Windows and Android support
-- All the API Requests are fully implemented
-- Working with the local Cache
+- Most of the API Requests are fully implemented and tested
+- Working with the local Cache (stored Access Token, Media, Modfiles)
 - Downloading / Uploading of Modfiles & Media
 
 Some of these are already done (Version 0.7), but others are WiP.
