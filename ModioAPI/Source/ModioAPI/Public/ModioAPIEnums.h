@@ -206,3 +206,20 @@ enum EModioAPI_DownloadInputAction
 	DownloadInputAction_Cancel				UMETA(DisplayName = "Cancel"),
 };
 */
+
+UENUM(BlueprintType, DisplayName = "mod.io Cache Filter Mode", Category = "mod.io API|Filtering", meta = (Tooltip = "Cache Filter Mode"))
+enum EModioAPI_CacheFilterMode
+{
+	CacheFilterMode_Contains			UMETA(DisplayName = "Includes / Contains"),
+	CacheFilterMode_ContainsNot			UMETA(DisplayName = "Includes Not / Contains Not"),
+};
+
+UENUM(BlueprintType, DisplayName = "mod.io Cache Time Filter Mode", Category = "mod.io API|Filtering", meta = (Tooltip = "Cache Time Filter Mode"))
+enum EModioAPI_CacheTimeFilterMode
+{
+	CacheTimeFilterMode_Same			UMETA(DisplayName = "Same"),
+	CacheTimeFilterMode_SameOrLater		UMETA(DisplayName = "Same or Later"),
+	CacheTimeFilterMode_Later			UMETA(DisplayName = "Later Only"),
+	CacheTimeFilterMode_SameOrBefore	UMETA(DisplayName = "Same or Before"),
+	CacheTimeFilterMode_BeforeOnly		UMETA(DisplayName = "Before Only"),
+};

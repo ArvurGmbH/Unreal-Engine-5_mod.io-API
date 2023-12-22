@@ -866,6 +866,64 @@ FModioAPI_MultipartUploadPart UModioAPIFunctionLibrary::ConvertJsonObjectToMulti
     return MultipartUploadPart;
 }
 
+FModioAPI_GetGameTagOptions UModioAPIFunctionLibrary::ConvertJsonObjectToGetGameTagOptions(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message)
+{
+    if (!JsonObject)
+    {
+        Success = false;
+        Message = "No Json Object for Conversion!";
+        return FModioAPI_GetGameTagOptions();
+    }
+
+    FModioAPI_GetGameTagOptions GetGameTagsOptions;
+    if (!FJsonObjectConverter::JsonObjectToUStruct<FModioAPI_GetGameTagOptions>(JsonObject.ToSharedRef(), &GetGameTagsOptions))
+    {
+        Success = false;
+        Message = "Error converting JSON Object to Get Game Tag Options!";
+        return FModioAPI_GetGameTagOptions();
+    }
+
+    Success = true;
+    Message = "Successfully converted JSON Object to Get Game Tag Options!";
+    return GetGameTagsOptions;
+}
+
+FModioAPI_GetModTags UModioAPIFunctionLibrary::ConvertJsonObjectToGetModTags(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message)
+{
+    if (!JsonObject)
+    {
+        Success = false;
+        Message = "No Json Object for Conversion!";
+        return FModioAPI_GetModTags();
+    }
+
+    FModioAPI_GetModTags_Schema GetModTagsSchema;
+    if (!FJsonObjectConverter::JsonObjectToUStruct<FModioAPI_GetModTags_Schema>(JsonObject.ToSharedRef(), &GetModTagsSchema))
+    {
+        Success = false;
+        Message = "Error converting JSON Object to Get Mod Tags!";
+        return FModioAPI_GetModTags();
+    }
+
+    FModioAPI_GetModTags GetModTags;
+    GetModTags.Result_Count = GetModTagsSchema.Result_Count;
+    GetModTags.Result_Limit = GetModTagsSchema.Result_Limit;
+    GetModTags.Result_Offset = GetModTagsSchema.Result_Offset;
+    GetModTags.Result_Total = GetModTagsSchema.Result_Total;
+    
+    FModioAPI_ModTag ModTag;
+    for (FModioAPI_ModTag_Object Object : GetModTagsSchema.Data)
+    {
+        ModTag.Name = Object.Name;
+        ModTag.Date_Added = FDateTime::FromUnixTimestamp(Object.Date_Added);
+        GetModTags.Data.Add(ModTag);
+    }
+
+    Success = true;
+    Message = "Successfully converted JSON Object to Get Mod Tags!";
+    return GetModTags;
+}
+
 FModioAPI_ModfilePlatform UModioAPIFunctionLibrary::ConvertModfilePlatformObjectToModfilePlatform(FModioAPI_ModfilePlatform_Object ModfilePlatformObject)
 {
     FModioAPI_ModfilePlatform ReturnValue;
@@ -1504,4 +1562,351 @@ int64 UModioAPIFunctionLibrary::GetContentRangeEndForUploadSessionOnPartNumber(T
     }
 
     return ContentRangeEnd;
+}
+
+bool UModioAPIFunctionLibrary::ModIncludesTag(FModioAPI_Mod Mod, FString Tag)
+{
+    for (FModioAPI_ModTag ModTag : Mod.Tags)
+    {
+        if (ModTag.Name == Tag)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool UModioAPIFunctionLibrary::ModIncludesPlatform(FModioAPI_Mod Mod, TEnumAsByte<EModioAPI_Platforms> Platform)
+{
+    for (FModioAPI_ModPlatforms ModPlatform : Mod.Platforms)
+    {
+        if (ModPlatform.Platform == ConvertPlatformToPlatformCode(Platform))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool UModioAPIFunctionLibrary::ModHasMetadataKVP(FModioAPI_Mod Mod, FString Key, FString Value)
+{
+    for (FModioAPI_MetadataKVP_Object KVP : Mod.Metadata_KVP)
+    {
+        if (KVP.Metakey == Key)
+        {
+            if (KVP.Metavalue == Value)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByName(TArray<FModioAPI_Mod> Mods, FString Name, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (Mod.Name.Contains(Name))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (!Mod.Name.Contains(Name))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsBySubmitter(TArray<FModioAPI_Mod> Mods, FString SubmittedBy, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (Mod.Submitted_By.Username.Contains(SubmittedBy))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (!Mod.Submitted_By.Username.Contains(SubmittedBy))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByVisibility(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_ModVisibility> Visibility, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (Mod.Visible == Visibility)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (Mod.Visible != Visibility)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByDateAdded(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+            case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Same:
+            if (Mod.Date_Added == DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrLater:
+            if (Mod.Date_Added >= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Later:
+            if (Mod.Date_Added > DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrBefore:
+            if (Mod.Date_Added <= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_BeforeOnly:
+            if (Mod.Date_Added < DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByDateLive(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Same:
+            if (Mod.Date_Live == DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrLater:
+            if (Mod.Date_Live >= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Later:
+            if (Mod.Date_Live > DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrBefore:
+            if (Mod.Date_Live <= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_BeforeOnly:
+            if (Mod.Date_Live < DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByDateUpdated(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Same:
+            if (Mod.Date_Updated == DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrLater:
+            if (Mod.Date_Updated >= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_Later:
+            if (Mod.Date_Updated > DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_SameOrBefore:
+            if (Mod.Date_Updated <= DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheTimeFilterMode::CacheTimeFilterMode_BeforeOnly:
+            if (Mod.Date_Updated < DateTime)
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByTag(TArray<FModioAPI_Mod> Mods, FString Tag, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (ModIncludesTag(Mod, Tag))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (!ModIncludesTag(Mod, Tag))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByPlatform(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_Platforms> Platform, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (ModIncludesPlatform(Mod, Platform))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (!ModIncludesPlatform(Mod, Platform))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::FilterModsByMetadataKVP(TArray<FModioAPI_Mod> Mods, FString Key, FString Value, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode)
+{
+    TArray<FModioAPI_Mod> Filtered;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        switch (FilterMode)
+        {
+        case EModioAPI_CacheFilterMode::CacheFilterMode_Contains:
+            if (ModHasMetadataKVP(Mod, Key, Value))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        case EModioAPI_CacheFilterMode::CacheFilterMode_ContainsNot:
+            if (!ModHasMetadataKVP(Mod, Key, Value))
+            {
+                Filtered.Add(Mod);
+            }
+            break;
+        }
+    }
+
+    return Filtered;
+}
+
+TArray<FModioAPI_Mod> UModioAPIFunctionLibrary::SortModsByID(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_SortingOrder> Order)
+{
+    // TODO
+    /*
+    TArray<FModioAPI_Mod> Sorted;
+
+    for (FModioAPI_Mod Mod : Mods)
+    {
+        
+    }
+
+    return Sorted;
+    */
+
+    return Mods;
 }

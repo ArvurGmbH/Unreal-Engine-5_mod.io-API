@@ -745,7 +745,6 @@ struct FModioAPI_GetModStats
     int32 Result_Total;
 };
 
-
 // Mod Tag
 
 USTRUCT(BlueprintType, Category = "mod.io API|Responses", meta = (DisplayName = "mod.io Mod Tag"))
@@ -753,10 +752,10 @@ struct FModioAPI_ModTag
 {
     GENERATED_BODY()
 
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "mod.io API|Mod Tag")
     FString Name;
 
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "mod.io API|Mod Tag")
     FDateTime Date_Added;
 };
 
@@ -855,7 +854,7 @@ struct FModioAPI_Mod
     TArray<FModioAPI_ModTag> Tags;
 };
 
-// Get Mod Stats
+// Get Mod Tags
 
 USTRUCT(BlueprintType, Category = "mod.io API|Responses", meta = (DisplayName = "mod.io Get Mod Tags"))
 struct FModioAPI_GetModTags

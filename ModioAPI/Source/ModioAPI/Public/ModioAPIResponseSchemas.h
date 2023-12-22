@@ -11,6 +11,20 @@ Released under GNU AGPLv3 License.
 mod.io Response Schemas
 */
 
+// Mod Tag
+
+USTRUCT()
+struct FModioAPI_ModTag_Object
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString Name;
+
+    UPROPERTY()
+    int64 Date_Added;
+};
+
 // Filehash
 
 USTRUCT(BlueprintType, Category = "mod.io API|Responses", meta = (DisplayName = "mod.io Filehash"))
@@ -179,20 +193,6 @@ struct FModioAPI_ModStats_Object
 
     UPROPERTY()
     int64 Date_Expires;
-};
-
-// Mod Tag
-
-USTRUCT()
-struct FModioAPI_ModTag_Object
-{
-    GENERATED_BODY()
-
-    UPROPERTY()
-    FString Name;
-
-    UPROPERTY()
-    int64 Date_Added;
 };
 
 // Download

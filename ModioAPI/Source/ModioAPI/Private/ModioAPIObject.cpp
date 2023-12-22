@@ -126,6 +126,20 @@ FString UModioAPIObject::GetModioRootDirectory()
 
 	#endif
 
+	#if PLATFORM_ANDROID
+
+	ModioRootPath = FPaths::ConvertRelativePathToFull(FPaths::ProjectPersistentDownloadDir());
+	if (ModioRootPath.EndsWith("/"))
+	{
+		ModioRootPath += "mod.io/";
+	}
+	else
+	{
+		ModioRootPath += "/mod.io/";
+	}
+
+	#endif
+
 	return ModioRootPath;
 }
 
@@ -573,31 +587,16 @@ bool UModioAPIObject::CleanupUploadSession(FString MultipartUploadSessionID, FSt
 
 bool UModioAPIObject::CleanupAllUploadSessions(FString& Message)
 {
-	TArray<FString> Directories;
 	FString UploadSessionsCacheDirectory = GetUploadSessionsDirectoryPath();
-	IFileManager::Get().FindFilesRecursive(Directories, *UploadSessionsCacheDirectory, TEXT("*"), false, true, true);
 
-	if (Directories.Num() < 1)
+	if (IFileManager::Get().DeleteDirectory(*UploadSessionsCacheDirectory, true, true))
 	{
-		Message = "Nothing to Cleanup!";
+		Message = "Successfully cleaned up all the Upload Sessions in Cache!";
 		return true;
 	}
 
-	FString UploadSessionID;
-
-	for(FString Directory : Directories)
-	{
-		Directory.Split("/", NULL, &UploadSessionID, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-
-		if (!CleanupUploadSession(UploadSessionID, Message))
-		{
-			Message = "Error when Cleaning up all the Upload Sessions in Cache!";
-			return false;
-		}
-	}
-
-	Message = "Successfully cleaned up all the Upload Sessions in Cache!";
-	return true;
+	Message = "Error when cleaning up all the Upload Sessions in Cache!";
+	return false;
 }
 
 FString UModioAPIObject::GetModfilesDirectoryPathForMod(int32 ModID)
@@ -857,6 +856,22 @@ bool UModioAPIObject::CacheWallet(FModioAPI_Wallet Wallet, FString& Message)
 	return true;
 }
 
+bool UModioAPIObject::CacheGameTagOptions(FModioAPI_GetGameTagOptions GameTagOptions, FString& Message)
+{
+	if (TempCache.CachedGames.Find(ModioGameID))
+	{
+		TempCache.CachedGames.Find(ModioGameID)->Tag_Options = GameTagOptions.Data;
+		Message = "Game Tag Options were cached!";
+		return true;
+	}
+	else
+	{
+		Message = "Game wasn't cached before!";
+	}
+
+	return false;
+}
+
 bool UModioAPIObject::GetCachedModfilesForMod(int32 ModID, TArray<int32>& Modfiles, FString& Message)
 {
 	if (ModID < 1)
@@ -901,6 +916,330 @@ bool UModioAPIObject::GetCachedActiveModfileForPlatform(FModioAPI_Mod Mod, TEnum
 	}
 
 	Modfile = FModioAPI_Modfile();
+	return false;
+}
+
+UTexture2D* UModioAPIObject::GetGameLogoFromCache(FString& Message)
+{
+	UTexture2D* GameLogo;
+
+	FImage LoadedImage;
+	FString FilePath = GetMediaDirectoryPathForGame() + "Logo.png";
+
+	if (!IFileManager::Get().FileExists(*FilePath))
+	{
+		Message = "Can't find Logo for Game from Cache!";
+		return NULL;
+	}
+
+	if (!FImageUtils::LoadImage(*FilePath, LoadedImage))
+	{
+		Message = "Can't load Logo for Game from Cache!";
+		return NULL;
+	}
+
+	GameLogo = FImageUtils::CreateTexture2DFromImage(LoadedImage);
+
+	return GameLogo;
+}
+
+UTexture2D* UModioAPIObject::GetGameHeaderFromCache(FString& Message)
+{
+	UTexture2D* GameHeader;
+
+	FImage LoadedImage;
+	FString FilePath = GetMediaDirectoryPathForGame() + "Header.png";
+
+	if (!IFileManager::Get().FileExists(*FilePath))
+	{
+		Message = "Can't find Header for Game from Cache!";
+		return NULL;
+	}
+
+	if (!FImageUtils::LoadImage(*FilePath, LoadedImage))
+	{
+		Message = "Can't load Header for Game from Cache!";
+		return NULL;
+	}
+
+	GameHeader = FImageUtils::CreateTexture2DFromImage(LoadedImage);
+
+	return GameHeader;
+}
+
+UTexture2D* UModioAPIObject::GetGameIconFromCache(FString& Message)
+{
+	UTexture2D* GameIcon;
+
+	FImage LoadedImage;
+	FString FilePath = GetMediaDirectoryPathForGame() + "Icon.png";
+
+	if (!IFileManager::Get().FileExists(*FilePath))
+	{
+		Message = "Can't find Icon for Game from Cache!";
+		return NULL;
+	}
+
+	if (!FImageUtils::LoadImage(*FilePath, LoadedImage))
+	{
+		Message = "Can't load Icon for Game from Cache!";
+		return NULL;
+	}
+
+	GameIcon = FImageUtils::CreateTexture2DFromImage(LoadedImage);
+
+	return GameIcon;
+}
+
+UTexture2D* UModioAPIObject::GetModLogoFromCache(int32 ModID, FString& Message)
+{
+	UTexture2D* ModLogo;
+
+	FImage LoadedImage;
+	FString FilePath = GetMediaDirectoryPathForMod(ModID) + "Logo.png";
+
+	if (!IFileManager::Get().FileExists(*FilePath))
+	{
+		Message = "Can't find Logo for Mod from Cache!";
+		return NULL;
+	}
+
+	if (!FImageUtils::LoadImage(*FilePath, LoadedImage))
+	{
+		Message = "Can't load Logo for Mod from Cache!";
+		return NULL;
+	}
+
+	ModLogo = FImageUtils::CreateTexture2DFromImage(LoadedImage);
+
+	return ModLogo;
+}
+
+TArray<UTexture2D*> UModioAPIObject::GetModImagesFromCache(int32 ModID, FString& Message)
+{
+	// TODO
+	Message = "Not implemented yet!";
+	return TArray<UTexture2D*>();
+}
+
+bool UModioAPIObject::GetModfilePathFromCache(int32 ModID, int32 ModfileID, FString& PathToModfile, FString& Message)
+{
+	PathToModfile = "";
+
+	if (ModID <= 0)
+	{
+		Message = "Invalid Mod ID!";
+		return false;
+	}
+
+	if (ModfileID <= 0)
+	{
+		Message = "Invalid Modfile ID!";
+		return false;
+	}
+
+	FString ModfileDirectory = GetModfileDirectoryPathForModfile(ModID, ModfileID);
+
+	if (!IFileManager::Get().DirectoryExists(*ModfileDirectory))
+	{
+		Message = "Directory for that Modfile doesn't exist in Cache!";
+		return false;
+	}
+
+	// Get Zip-Archive from Folder
+	TArray<FString> Files = TArray<FString>();
+	IFileManager::Get().FindFiles(Files, *ModfileDirectory);
+
+	for (FString File : Files)
+	{
+		if (File.ToLower().EndsWith(".zip"))
+		{
+			PathToModfile = File;
+			Message = "Found the Modfile Zip-Archive!";
+			return true;
+		}
+	}
+
+	Message = "No Zip-Archive found in the Cache Directory for the Modfile!";
+	return false;
+}
+
+UTexture2D* UModioAPIObject::GetAvatarOfUserFromCache(int32 UserID, FString& Message)
+{
+	UTexture2D* UserAvatar;
+
+	FImage LoadedImage;
+
+	// TODO: This could potentially be a different type of Image-File / Extension (.jpg, .jpeg, etc.)
+	FString FilePath = GetAvatarDirectoryPathForUser(UserID) + "Avatar.png";
+
+	if (!IFileManager::Get().FileExists(*FilePath))
+	{
+		Message = "Can't find Avatar of User in Cache!";
+		return NULL;
+	}
+
+	if (!FImageUtils::LoadImage(*FilePath, LoadedImage))
+	{
+		Message = "Can't load Avatar of User from Cache!";
+		return NULL;
+	}
+
+	UserAvatar = FImageUtils::CreateTexture2DFromImage(LoadedImage);
+
+	return UserAvatar;
+}
+
+bool UModioAPIObject::ClearCachedAvatarForUser(FModioAPI_User User)
+{
+	if (User.ID <= 0)
+	{
+		return false;
+	}
+
+	// Clear Cached Avatar
+	TArray<FString> Files = TArray<FString>();
+	FString UserDirectory = GetAvatarDirectoryPathForUser(User.ID);
+	IFileManager::Get().FindFiles(Files, *UserDirectory);
+
+	for (FString File : Files)
+	{
+		if (File.Contains("Avatar"))
+		{
+			if (IFileManager::Get().Delete(*(UserDirectory + File), true))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForUser(FModioAPI_User User)
+{
+	if (User.ID <= 0)
+	{
+		return false;
+	}
+
+	FString UserDirectory = GetAvatarDirectoryPathForUser(User.ID);
+	if (IFileManager::Get().DeleteDirectory(*UserDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForAllUsers()
+{
+	FString UsersDirectory = GetUsersDirectoryPath();
+	if (IFileManager::Get().DeleteDirectory(*UsersDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForGuide(FModioAPI_Guide Guide)
+{
+	if (Guide.ID <= 0)
+	{
+		return false;
+	}
+
+	FString GuideDirectory = GetDirectoryPathForGuide(Guide.ID);
+	if (IFileManager::Get().DeleteDirectory(*GuideDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForAllGuides()
+{
+	FString GuidesDirectory = GetGuidesDirectoryPath();
+	if (IFileManager::Get().DeleteDirectory(*GuidesDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedMediaForMod(FModioAPI_Mod Mod)
+{
+	FString ModsMediaDirectory = GetMediaDirectoryPathForMod(Mod.ID);
+	if (IFileManager::Get().DeleteDirectory(*ModsMediaDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedModfilesForMod(FModioAPI_Mod Mod)
+{
+	FString ModsModfilesDirectory = GetModfilesDirectoryPathForMod(Mod.ID);
+	if (IFileManager::Get().DeleteDirectory(*ModsModfilesDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedModfilesForModExcept(FModioAPI_Mod Mod, int32 ExceptedModfileID)
+{
+	FString ModsModfilesDirectory = GetModfilesDirectoryPathForMod(Mod.ID);
+	TArray<FString> Directories;
+
+	IFileManager::Get().FindFilesRecursive(Directories, *ModsModfilesDirectory, TEXT("*"), false, true, true);
+
+	for (FString Directory : Directories)
+	{
+		if (!Directory.EndsWith(FString::FromInt(ExceptedModfileID)))
+		{
+			IFileManager::Get().DeleteDirectory(*Directory, true, true);
+		}
+	}
+
+	return true;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForMod(FModioAPI_Mod Mod)
+{
+	FString ModFileStorageDirectory = GetDirectoryPathForMod(Mod.ID);
+	if (IFileManager::Get().DeleteDirectory(*ModFileStorageDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearCachedFileStorageForAllMods()
+{
+	FString ModsFileStorageDirectory = GetModsDirectoryPath();
+	if (IFileManager::Get().DeleteDirectory(*ModsFileStorageDirectory, true, true))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool UModioAPIObject::ClearPersistingCache()
+{
+	FString PersistingCacheFilePath = GetPersistingCacheFilePath();
+	if (IFileManager::Get().Delete(*PersistingCacheFilePath, true))
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -2332,8 +2671,32 @@ bool UModioAPIObject::RequestGetModEvents(int32 ModID, FString& Message)
 
 bool UModioAPIObject::RequestGetGameTagOptions(FString& Message)
 {
-	Message = "Not yet implemented!";
-	return false;
+	if (!IsInitialized())
+	{
+		Message = "Mod.io not yet initialized!";
+		return false;
+	}
+
+	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+
+	FString TargetURL = GetApiPath() + EndpointGames + "/" + FString::FromInt(ModioGameID) + EndpointTags + GetApiKey();
+
+	Request->SetURL(TargetURL);
+	Request->OnProcessRequestComplete().BindUObject(this, &UModioAPIObject::GetGameTagOptions_ResponseReceived);
+	Request->SetVerb("GET");
+	Request->AppendToHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->AppendToHeader("Accept", "application/json");
+
+	if (Request->ProcessRequest())
+	{
+		Message = "Successfully processed Request for 'Get Game Tag Options'!";
+		return true;
+	}
+	else
+	{
+		Message = "Error when Processing Request for 'Get Game Tag Options'!";
+		return false;
+	}
 }
 
 bool UModioAPIObject::RequestAddGameTagOptions(FString AccessToken, FModioAPI_AddGameTagOption, FString& Message)
@@ -2356,14 +2719,98 @@ bool UModioAPIObject::RequestRenameGameTag(FString AccessToken, FString From, FS
 
 bool UModioAPIObject::RequestGetModTags(int32 ModID, FString& Message)
 {
-	Message = "Not yet implemented!";
-	return false;
+	if (!IsInitialized())
+	{
+		Message = "Mod.io not yet initialized!";
+		return false;
+	}
+
+	if (ModID <= 0)
+	{
+		Message = "Mod ID is invalid!";
+		return false;
+	}
+
+	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+
+	FString TargetURL = GetApiPath() + EndpointGames + "/" + FString::FromInt(ModioGameID) + EndpointMods + "/" + FString::FromInt(ModID) + EndpointTags + GetApiKey();
+
+	Request->SetURL(TargetURL);
+	Request->OnProcessRequestComplete().BindUObject(this, &UModioAPIObject::GetModTags_ResponseReceived);
+	Request->SetVerb("GET");
+	Request->AppendToHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->AppendToHeader("Accept", "application/json");
+
+	if (Request->ProcessRequest())
+	{
+		Message = "Successfully processed Request for 'Get Game Tag Options'!";
+		return true;
+	}
+	else
+	{
+		Message = "Error when Processing Request for 'Get Game Tag Options'!";
+		return false;
+	}
 }
 
 bool UModioAPIObject::RequestAddModTags(FString AccessToken, int32 ModID, TArray<FString> Tags, FString& Message)
 {
-	Message = "Not yet implemented!";
-	return false;
+	if (!IsInitialized())
+	{
+		Message = "Mod.io not yet initialized!";
+		return false;
+	}
+
+	if (!AccessToken.IsEmpty())
+	{
+		if (!IsAuthorized())
+		{
+			Message = "You need to be authorized (logged in) to Request this!";
+			return false;
+		}
+	}
+
+	if (ModID <= 0)
+	{
+		Message = "Mod ID is invalid!";
+		return false;
+	}
+
+	if (Tags.IsEmpty())
+	{
+		Message = "Array of Tags to add is empty!";
+		return false;
+	}
+
+	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+
+	FString TargetURL = GetApiPath() + EndpointGames + "/" + FString::FromInt(ModioGameID) + EndpointMods + "/" + FString::FromInt(ModID) + EndpointTags + GetApiKey();
+
+	Request->SetURL(TargetURL);
+	Request->OnProcessRequestComplete().BindUObject(this, &UModioAPIObject::AddModTags_ResponseReceived);
+	Request->SetVerb("POST");
+	Request->AppendToHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->AppendToHeader("Accept", "application/json");
+
+	if (CachesAccessTokenAutomatically() && AccessToken.IsEmpty())
+	{
+		Request->AppendToHeader("Authorization", EndpointAuthenticationBearer + PersistingCache.CachedAccessToken.AccessToken);
+	}
+	else
+	{
+		Request->AppendToHeader("Authorization", EndpointAuthenticationBearer + AccessToken);
+	}
+
+	if (Request->ProcessRequest())
+	{
+		Message = "Successfully processed Request for 'Get Game Tag Options'!";
+		return true;
+	}
+	else
+	{
+		Message = "Error when Processing Request for 'Get Game Tag Options'!";
+		return false;
+	}
 }
 
 bool UModioAPIObject::DeleteModTags(FString AccessToken, int32 ModID, TArray<FString> Tags, FString& Message)
@@ -3822,6 +4269,31 @@ void UModioAPIObject::GetModEvents_ResponseReceived(FHttpRequestPtr Request, FHt
 
 void UModioAPIObject::GetGameTagOptions_ResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
 {
+	// Prepare received Response and Variables
+	TSharedPtr<FJsonObject> ResponseObj = UModioAPIFunctionLibrary::ConvertResponseToJsonObject(Response);
+	bool ConvertSuccess = false;
+	FString ConvertMessage = "";
+
+	// Expects Response Code 200 for Successful Request
+	if (Response.Get()->GetResponseCode() != 200)
+	{
+		FModioAPI_Error_Object ErrorResponse = UModioAPIFunctionLibrary::ConvertJsonObjectToError(ResponseObj, ConvertSuccess, ConvertMessage);
+		OnResponseReceived_GetGameTagOptions.Broadcast(FModioAPI_GetGameTagOptions(), ErrorResponse);
+		return;
+	}
+
+	FModioAPI_GetGameTagOptions GetGameTagOptions = UModioAPIFunctionLibrary::ConvertJsonObjectToGetGameTagOptions(ResponseObj, ConvertSuccess, ConvertMessage);
+
+	// Did we receive what we expected?
+	if (!ConvertSuccess)
+	{
+		FModioAPI_Error_Object ErrorResponse = UModioAPIFunctionLibrary::ConvertJsonObjectToError(ResponseObj, ConvertSuccess, ConvertMessage);
+		OnResponseReceived_GetGameTagOptions.Broadcast(FModioAPI_GetGameTagOptions(), ErrorResponse);
+		return;
+	}
+
+	CacheGameTagOptions(GetGameTagOptions, ConvertMessage);
+	OnResponseReceived_GetGameTagOptions.Broadcast(GetGameTagOptions, FModioAPI_Error_Object());
 }
 
 void UModioAPIObject::GetGameTagOption_ResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
@@ -3838,6 +4310,31 @@ void UModioAPIObject::RenameGameTag_ResponseReceived(FHttpRequestPtr Request, FH
 
 void UModioAPIObject::GetModTags_ResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
 {
+	// Prepare received Response and Variables
+	TSharedPtr<FJsonObject> ResponseObj = UModioAPIFunctionLibrary::ConvertResponseToJsonObject(Response);
+	bool ConvertSuccess = false;
+	FString ConvertMessage = "";
+
+	// Expects Response Code 200 for Successful Request
+	if (Response.Get()->GetResponseCode() != 200)
+	{
+		FModioAPI_Error_Object ErrorResponse = UModioAPIFunctionLibrary::ConvertJsonObjectToError(ResponseObj, ConvertSuccess, ConvertMessage);
+		OnResponseReceived_GetModTags.Broadcast(FModioAPI_GetModTags(), ErrorResponse);
+		return;
+	}
+
+	FModioAPI_GetModTags GetModTags = UModioAPIFunctionLibrary::ConvertJsonObjectToGetModTags(ResponseObj, ConvertSuccess, ConvertMessage);
+
+	// Did we receive what we expected?
+	if (!ConvertSuccess)
+	{
+		FModioAPI_Error_Object ErrorResponse = UModioAPIFunctionLibrary::ConvertJsonObjectToError(ResponseObj, ConvertSuccess, ConvertMessage);
+		OnResponseReceived_GetModTags.Broadcast(FModioAPI_GetModTags(), ErrorResponse);
+		return;
+	}
+
+	//CacheGameTagOptions(GetGameTagOptions, ConvertMessage);
+	OnResponseReceived_GetModTags.Broadcast(GetModTags, FModioAPI_Error_Object());
 }
 
 void UModioAPIObject::AddModTags_ResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
@@ -4369,6 +4866,11 @@ bool UModioAPIObject::GetCached_Games(FModioAPI_RequestFilters Filters, FModioAP
 
 bool UModioAPIObject::GetCached_Game(FModioAPI_Game& Game)
 {
+	if (TempCache.CachedGames.IsEmpty())
+	{
+		return false;
+	}
+
 	if (TempCache.CachedGames.Find(ModioGameID)->ID > 0)
 	{
 		Game = *TempCache.CachedGames.Find(ModioGameID);

@@ -51,6 +51,8 @@ public:
 	static FHttpRequestRef CreateRequestForAddModfile(FModioAPI_AddModfile AddModfile, bool& Success, FString& Message);
 	static FModioAPI_MultipartUpload ConvertJsonObjectToMultipartUpload(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message);
 	static FModioAPI_MultipartUploadPart ConvertJsonObjectToMultipartUploadPart(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message);
+	static FModioAPI_GetGameTagOptions ConvertJsonObjectToGetGameTagOptions(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message);
+	static FModioAPI_GetModTags ConvertJsonObjectToGetModTags(TSharedPtr<FJsonObject> JsonObject, bool& Success, FString& Message);
 
 	static FModioAPI_ModfilePlatform ConvertModfilePlatformObjectToModfilePlatform(FModioAPI_ModfilePlatform_Object ModfilePlatformObject);
 	static FModioAPI_Download ConvertDownloadObjectToDownload(FModioAPI_Download_Object DownloadObject);
@@ -91,4 +93,47 @@ public:
 	static FString FindUploadPartFileByPartNumber(TArray<FString> UploadPartFiles, int32 PartNumber);
 	static int64 GetContentRangeStartForUploadPartNumber(int32 PartNumber);
 	static int64 GetContentRangeEndForUploadSessionOnPartNumber(TArray<FString> UploadPartFiles, int32 PartNumber);
+
+	// Cache Filters
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static bool ModIncludesTag(FModioAPI_Mod Mod, FString Tag);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static bool ModIncludesPlatform(FModioAPI_Mod Mod, TEnumAsByte<EModioAPI_Platforms> Platform);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static bool ModHasMetadataKVP(FModioAPI_Mod Mod, FString Key, FString Value);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByName(TArray<FModioAPI_Mod> Mods, FString Name, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsBySubmitter(TArray<FModioAPI_Mod> Mods, FString SubmittedBy, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByVisibility(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_ModVisibility> Visibility, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByDateAdded(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByDateLive(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByDateUpdated(TArray<FModioAPI_Mod> Mods, FDateTime DateTime, TEnumAsByte<EModioAPI_CacheTimeFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByTag(TArray<FModioAPI_Mod> Mods, FString Tag, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByPlatform(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_Platforms> Platform, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Filtering")
+	static TArray<FModioAPI_Mod> FilterModsByMetadataKVP(TArray<FModioAPI_Mod> Mods, FString Key, FString Value, TEnumAsByte<EModioAPI_CacheFilterMode> FilterMode);
+
+	// Cache Sorting
+
+	UFUNCTION(BlueprintPure, Category = "mod.io API|Sorting")
+	static TArray<FModioAPI_Mod> SortModsByID(TArray<FModioAPI_Mod> Mods, TEnumAsByte<EModioAPI_SortingOrder> Order);
 };
