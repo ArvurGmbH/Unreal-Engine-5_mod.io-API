@@ -32,7 +32,7 @@ I simply included them along in this repository.
 
 # This is Work-in-Progress
 I'm planning to have a Version 1.0 ready by the end of 2023.
-Every API Call implemented yet is tested while being implemented. Yet no additional testing has been done, so expect challenges, problems, holdups or errors!
+Every API Call implemented yet is tested on implementation in the Plugin. Yet no additional testing has been done, so expect challenges, problems, holdups or errors!
 Also so far only about 50% of the API Requests are fully implemented!
 
 What can you expect from Version 1.0?
@@ -42,7 +42,7 @@ What can you expect from Version 1.0?
 - Working with the local Cache (stored Access Token, Media, Modfiles)
 - Downloading / Uploading of Modfiles & Media
 
-Some of these are already done (Version 0.7), but others are WiP.
+Some of these are already done (Version 0.9), but others are WiP.
 
 # How to use it in Blueprints
 Anywhere in your Unreal Engine project you can access the mod.io API Subsystem:
